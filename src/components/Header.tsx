@@ -3,6 +3,7 @@ import { Search, ShoppingCart, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useProducts } from "@/lib/queries";
+import { AccountMenu } from "@/components/AccountMenu";
 
 export function Header() {
   const { count } = useCart();
@@ -39,13 +40,7 @@ export function Header() {
             </button>
           </form>
           <div className="ml-auto flex items-center gap-2 md:ml-0">
-            <span className="hidden items-center gap-2 rounded px-2 py-1 text-sm sm:flex">
-              <User className="h-5 w-5" />
-              <span className="leading-tight">
-                <span className="block text-xs opacity-75">Hello, guest</span>
-                <span className="font-bold">Account</span>
-              </span>
-            </span>
+            <AccountMenu />
             <Link to="/cart" className="focus-ring relative flex items-center gap-1 rounded px-2 py-1 font-bold" aria-label={`Cart, ${count} items`}>
               <span className="relative">
                 <ShoppingCart className="h-7 w-7" />

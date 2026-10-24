@@ -11,6 +11,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { CartProvider } from "@/lib/cart";
+import { AuthProvider } from "@/lib/auth-context";
 import { captureAttribution } from "@/lib/attribution";
 import { Header } from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner";
@@ -126,6 +127,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <AuthProvider>
       <CartProvider>
         <div className="min-h-screen bg-background">
           <Header />
@@ -136,6 +138,7 @@ function RootComponent() {
         </div>
         <Toaster position="top-center" />
       </CartProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
