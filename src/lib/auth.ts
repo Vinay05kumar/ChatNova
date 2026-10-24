@@ -27,7 +27,8 @@ export type FieldErrors = Record<string, string[]>;
 
 export const AUTH_UNAVAILABLE = "Authentication service is not available yet";
 export const INVALID_CREDENTIALS = "Incorrect email or password.";
-export const RATE_LIMITED = "Too many sign-in attempts. Please wait a few minutes before trying again.";
+export const RATE_LIMITED =
+  "Too many sign-in attempts. Please wait a few minutes before trying again.";
 // Same wording as the server-error message in api.ts.
 const SERVER_ERROR = "Our store is having trouble right now. Please try again shortly.";
 
@@ -39,7 +40,11 @@ async function raw(path: string, init: RequestInit = {}): Promise<{ res: Respons
     res = await fetch(`${environment.apiBaseUrl}${path}`, {
       ...init,
       credentials: "include",
-      headers: { Accept: "application/json", ...(init.body ? { "Content-Type": "application/json" } : {}), ...init.headers },
+      headers: {
+        Accept: "application/json",
+        ...(init.body ? { "Content-Type": "application/json" } : {}),
+        ...init.headers,
+      },
     });
   } catch {
     throw new ApiError("network", AUTH_UNAVAILABLE);
@@ -56,9 +61,16 @@ async function raw(path: string, init: RequestInit = {}): Promise<{ res: Respons
 }
 
 function toError(status: number, body: any, isLogin = false): ApiError {
-  if (status === 422) return new ApiError("validation", "Please correct the highlighted fields.", 422, body);
+  if (status === 422)
+    return new ApiError("validation", "Please correct the highlighted fields.", 422, body);
   if (status === 401 && isLogin) return new ApiError("other", INVALID_CREDENTIALS, 401, body);
-  if (status === 429) return new ApiError("rate_limited", isLogin ? RATE_LIMITED : "Too many requests. Please wait a moment and try again.", 429, body);
+  if (status === 429)
+    return new ApiError(
+      "rate_limited",
+      isLogin ? RATE_LIMITED : "Too many requests. Please wait a moment and try again.",
+      429,
+      body,
+    );
   if (status === 404) return new ApiError("not_found", AUTH_UNAVAILABLE, 404, body);
   if (status >= 500) return new ApiError("server", SERVER_ERROR, status, body);
   return new ApiError("other", "Something went wrong. Please try again.", status, body);
@@ -67,7 +79,8 @@ function toError(status: number, body: any, isLogin = false): ApiError {
 export async function fetchCsrf(): Promise<string> {
   const { res, body } = await raw("/auth/csrf/");
   if (!res.ok) throw toError(res.status, body);
-  if (typeof body?.csrf_token !== "string" || !body.csrf_token) throw new ApiError("other", "Something went wrong. Please try again.", res.status, body);
+  if (typeof body?.csrf_token !== "string" || !body.csrf_token)
+    throw new ApiError("other", "Something went wrong. Please try again.", res.status, body);
   csrfToken = body.csrf_token;
   return body.csrf_token;
 }
@@ -75,7 +88,8 @@ export async function fetchCsrf(): Promise<string> {
 /** POST with CSRF; on 403 refresh the token and retry exactly once. Rotates the token after success. */
 async function authPost(path: string, payload: unknown | undefined, isLogin = false): Promise<any> {
   const bodyStr = payload === undefined ? undefined : JSON.stringify(payload);
-  const send = async (token: string) => raw(path, { method: "POST", body: bodyStr, headers: { "X-CSRFToken": token } });
+  const send = async (token: string) =>
+    raw(path, { method: "POST", body: bodyStr, headers: { "X-CSRFToken": token } });
 
   let { res, body } = await send(csrfToken ?? (await fetchCsrf()));
   if (res.status === 403) {
@@ -90,7 +104,8 @@ async function authPost(path: string, payload: unknown | undefined, isLogin = fa
 
 function readUser(body: any): AuthUser {
   const u = body?.user;
-  if (!u || typeof u !== "object" || typeof u.email !== "string") throw new ApiError("other", "Something went wrong. Please try again.", undefined, body);
+  if (!u || typeof u !== "object" || typeof u.email !== "string")
+    throw new ApiError("other", "Something went wrong. Please try again.", undefined, body);
   return u as AuthUser;
 }
 

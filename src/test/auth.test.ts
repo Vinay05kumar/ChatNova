@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { login, normalizePhone, AUTH_UNAVAILABLE, INVALID_CREDENTIALS } from "@/lib/auth";
 
-const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+const json = (status: number, body: unknown) =>
+  new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -12,9 +13,11 @@ describe("auth", () => {
   });
 
   it("retries a 403 login exactly once with a fresh CSRF token", async () => {
-    const f = vi.spyOn(globalThis, "fetch").mockImplementation(async (url) =>
-      String(url).endsWith("/auth/csrf/") ? json(200, { csrf_token: "t" }) : json(403, {}),
-    );
+    const f = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async (url) =>
+        String(url).endsWith("/auth/csrf/") ? json(200, { csrf_token: "t" }) : json(403, {}),
+      );
     await expect(login({ email: "a@b.co", password: "x" })).rejects.toBeTruthy();
     const posts = f.mock.calls.filter(([u]) => String(u).endsWith("/auth/login/"));
     expect(posts).toHaveLength(2);
@@ -22,7 +25,9 @@ describe("auth", () => {
 
   it("shows the generic message on 401", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation(async (url) =>
-      String(url).endsWith("/auth/csrf/") ? json(200, { csrf_token: "t" }) : json(401, { error: "invalid_credentials" }),
+      String(url).endsWith("/auth/csrf/")
+        ? json(200, { csrf_token: "t" })
+        : json(401, { error: "invalid_credentials" }),
     );
     await expect(login({ email: "a@b.co", password: "x" })).rejects.toThrow(INVALID_CREDENTIALS);
   });
