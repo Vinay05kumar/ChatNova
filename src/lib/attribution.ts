@@ -2,11 +2,11 @@ import type { Attribution } from "./api";
 
 const KEY = "cartnova:first_touch";
 
-/** Captures first-touch attribution once; never overwrites existing data. Call from useEffect. */
+/** Captures attribution, replacing it only for an explicit utm_source. Call from useEffect. */
 export function captureAttribution() {
   if (typeof window === "undefined") return;
-  if (localStorage.getItem(KEY)) return;
   const p = new URLSearchParams(window.location.search);
+  if (localStorage.getItem(KEY) && !p.has("utm_source")) return;
   const data: Attribution = {
     utm_source: p.get("utm_source") || "direct",
     utm_medium: p.get("utm_medium") || "",
