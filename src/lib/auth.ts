@@ -89,7 +89,7 @@ export async function fetchCsrf(): Promise<string> {
 async function authPost(path: string, payload: unknown | undefined, isLogin = false): Promise<any> {
   const bodyStr = payload === undefined ? undefined : JSON.stringify(payload);
   const send = async (token: string) =>
-    raw(path, { method: "POST", body: bodyStr, headers: { "X-CSRFToken": token } });
+    raw(path, { method: "POST", body: bodyStr ?? null, headers: { "X-CSRFToken": token } });
 
   let { res, body } = await send(csrfToken ?? (await fetchCsrf()));
   if (res.status === 403) {
