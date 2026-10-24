@@ -19,7 +19,7 @@ async function tick(ms: number) { await act(async () => { vi.advanceTimersByTime
 function signIn() {
   fireEvent.change(screen.getByLabelText("Email address"), { target: { value: user.email } });
   fireEvent.change(screen.getByLabelText("Password", { exact: true }), { target: { value: "Testpass123" } });
-  fireEvent.submit(screen.getByRole("button", { name: "Sign in", exact: true }).closest("form") as HTMLFormElement);
+  fireEvent.submit(screen.getByRole("button", { name: "Sign in" }).closest("form") as HTMLFormElement);
 }
 beforeEach(() => {
   vi.useFakeTimers();
@@ -58,9 +58,9 @@ describe("mandatory homepage authentication", () => {
   });
   it("switches both forms within the popup", async () => {
     await mount(); await tick(2000);
-    fireEvent.click(screen.getByRole("button", { name: "Sign Up", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Sign Up" }));
     expect(screen.getByLabelText("Full name")).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Sign In", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
     expect(screen.queryByLabelText("Full name")).toBeNull();
     expect(screen.getByRole("dialog")).toBeVisible();
   });
@@ -82,12 +82,13 @@ describe("mandatory homepage authentication", () => {
   it("closes after sign-up and preserves the existing cart", async () => {
     const register = vi.spyOn(auth, "register").mockResolvedValue(user);
     await mount(); await tick(2000);
-    fireEvent.click(screen.getByRole("button", { name: "Sign Up", exact: true }));
-    for (const [label, value] of [["Full name", user.name], ["Email address", user.email], ["Phone number", user.phone], ["Password", "Testpass123"], ["Confirm password", "Testpass123"]]) {
+    fireEvent.click(screen.getByRole("button", { name: "Sign Up" }));
+    const fields: [string, string][] = [["Full name", user.name], ["Email address", user.email], ["Phone number", user.phone], ["Password", "Testpass123"], ["Confirm password", "Testpass123"]];
+    for (const [label, value] of fields) {
       fireEvent.change(screen.getByLabelText(label, { exact: true }), { target: { value } });
     }
     fireEvent.click(screen.getByRole("checkbox"));
-    await act(async () => { fireEvent.submit(screen.getByRole("button", { name: "Create account", exact: true }).closest("form") as HTMLFormElement); });
+    await act(async () => { fireEvent.submit(screen.getByRole("button", { name: "Create account" }).closest("form") as HTMLFormElement); });
     expect(register).toHaveBeenCalledWith({ name: user.name, email: user.email, phone: user.phone, password: "Testpass123", accepted_terms: true });
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(JSON.parse(localStorage.getItem("cartnova:cart") ?? "null")).toEqual(savedCart);
