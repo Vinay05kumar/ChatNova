@@ -4,7 +4,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -25,11 +24,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // SSR and first client render both start as "loading" (no hydration mismatch).
   const [user, setUser] = useState<AuthUser | null>(null);
   const [status, setStatus] = useState<Status>("loading");
-  const started = useRef(false);
 
   useEffect(() => {
-    if (started.current) return;
-    started.current = true;
     let alive = true;
     auth.getCurrentUser().then((u) => {
       if (!alive) return;

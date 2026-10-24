@@ -13,3 +13,4 @@
 - Runtime config (API URL, poll intervals, low-stock threshold) lives in src/config/environment.ts, driven by VITE_* vars. Why: must be environment-configurable.
 - The cart is persisted in localStorage as [{sku, qty}] only; prices are display-only and never sent in orders. Why: server is the source of truth for pricing.
 - Auth is server-session cookies via src/lib/auth.ts + AuthProvider (src/lib/auth-context.tsx); user lives in memory only and /auth/me/ runs in a browser useEffect, never in loaders/SSR. Why: ConnectSphere owns sessions and the app is SSR.
+- Authentication pages and the mandatory root-mounted popup share SignInForm and SignUpForm; gate visibility derives from AuthProvider after a homepage browser timer. Why: validation and session handling stay unified, and navigation cannot dismiss an active gate.

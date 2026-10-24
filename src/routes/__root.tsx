@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useRouterState,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
@@ -14,6 +15,7 @@ import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth-context";
 import { captureAttribution } from "@/lib/attribution";
 import { Header } from "@/components/Header";
+import { MandatoryAuthPopup } from "@/components/MandatoryAuthPopup";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -120,6 +122,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const homepage = useRouterState({ select: (state) => state.location.pathname === "/" });
   useEffect(() => {
     captureAttribution();
   }, []);
@@ -137,6 +140,7 @@ function RootComponent() {
           <footer className="mt-12 bg-nav py-8 text-center text-sm text-nav-foreground">© CartNova</footer>
         </div>
         <Toaster position="top-center" />
+        <MandatoryAuthPopup homepage={homepage} />
       </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
