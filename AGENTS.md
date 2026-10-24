@@ -12,3 +12,4 @@
 - CartNova is frontend-only: all product/stock/order data comes from the external Django REST API via src/lib/api.ts; never add mock data or a backend. Why: the backend is provided separately.
 - Runtime config (API URL, poll intervals, low-stock threshold) lives in src/config/environment.ts, driven by VITE_* vars. Why: must be environment-configurable.
 - The cart is persisted in localStorage as [{sku, qty}] only; prices are display-only and never sent in orders. Why: server is the source of truth for pricing.
+- Auth is server-session cookies via src/lib/auth.ts + AuthProvider (src/lib/auth-context.tsx); user lives in memory only and /auth/me/ runs in a browser useEffect, never in loaders/SSR. Why: ConnectSphere owns sessions and the app is SSR.
